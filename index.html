@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移動履歴アニメーション</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="js/functions.js"></script>
+</head>
+<body>
+    <h1>移動履歴アニメーション</h1>
+    <input type="file" id="fileInput" accept=".json">
+    <div id="map">
+        <div id="time-label">時刻: --:--:--</div>
+    </div>
+
+    <script>
+        let map = L.map("map").setView([34.6833, 137.5720], 15); // 初期位置
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+
+        let polyline, marker, locations = [], index = 0, intervalId = null;
+        const timeLabel = document.getElementById("time-label");
+
+        document.getElementById("fileInput").addEventListener("change", handleFile);
+    </script>
+</body>
+</html>

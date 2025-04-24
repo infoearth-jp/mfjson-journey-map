@@ -1,0 +1,54 @@
+body {
+    text-align: center;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    background: linear-gradient(135deg, #ffccff, #ccffff);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    font-size: 2rem;
+    color: #ff66b2;
+    text-shadow: 2px 2px 4px #ffffff;
+}
+#map {
+    width: 1000px;
+    height: 600px;
+    margin: 20px auto;
+    border: 5px solid #ff66b2;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+#fileInput {
+    padding: 10px;
+    border: 2px solid #ff66b2;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+}
+#time-label {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    font-size: 1.5rem;
+    color: #555;
+    z-index: 1000;
+}
+button {
+    padding: 10px 20px;
+    background: #ff66b2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover {
+    background: #ff3385;
+}
