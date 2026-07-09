@@ -16,7 +16,8 @@
         <input type="file" id="fileInput" accept=".json">
     </div>
     <div id="buttonSection">
-        <button id="sliceButton" disabled>10秒間隔に切り替え</button>
+        <button id="slice30Button" disabled>30秒間隔に切り替え</button>
+        <button id="slice10Button" disabled>10秒間隔に切り替え</button>
         <button id="rawButton" disabled>元データに切り替え</button>
     </div>
     <div id="map">
@@ -32,13 +33,15 @@
         }).addTo(map);
 
         let polyline, marker, locations = [], index = 0, intervalId = null;
-        let rawLocations = [], slicedLocations = [];
+        let rawLocations = [], sliced10Locations = [], sliced30Locations = [];
         const timeLabel = document.getElementById("time-label");
-        const sliceButton = document.getElementById("sliceButton");
+        const slice10Button = document.getElementById("slice10Button");
+        const slice30Button = document.getElementById("slice30Button");
         const rawButton = document.getElementById("rawButton");
 
         document.getElementById("fileInput").addEventListener("change", handleFile);
-        sliceButton.addEventListener("click", () => switchLocations(slicedLocations));
+        slice10Button.addEventListener("click", () => switchLocations(sliced10Locations));
+        slice30Button.addEventListener("click", () => switchLocations(sliced30Locations));
         rawButton.addEventListener("click", () => switchLocations(rawLocations));
     </script>
 </body>

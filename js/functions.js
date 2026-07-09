@@ -12,6 +12,9 @@
 //   }}
 
 // 画面描画 ==================================================
+// ラインを引くには2点必要
+const MIN_LOCATIONS = 2;
+
 function handleFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -21,14 +24,15 @@ function handleFile(event) {
         try {
             const data = JSON.parse(e.target.result).activity_log;
 
-            if (data.geometry?.coordinates?.length > 0 && data.properties?.datetimes?.length > 0) {
+            if (data.geometry?.coordinates?.length >= MIN_LOCATIONS && data.properties?.datetimes?.length >= MIN_LOCATIONS) {
                 // 緯度経度と時刻を取得(日本を想定しているので、大きい方が経度lon)
                 rawLocations = data.geometry.coordinates.map((coord, i) => ({
                     lat: coord[0] > coord[1] ? coord[1] : coord[0], // 緯度
                     lon: coord[0] > coord[1] ? coord[0] : coord[1], // 経度
                     time: new Date(data.properties.datetimes[i])
                 }));
-                slicedLocations = complementMfjsonHandler(data);
+                sliced10Locations = complementMfjsonHandler(data, 1000, 10000);
+                sliced30Locations = complementMfjsonHandler(data, 1000, 30000);
 
                 locations = rawLocations;
 
@@ -38,8 +42,7 @@ function handleFile(event) {
                 map.setView([center.lat, center.lon], 15);
 
                 startAnimation();
-                // 10秒グリッドに乗る点が無いほど短い軌跡は、切り替えさせない
-                setButtonsEnabled(slicedLocations.length > 0, false);
+                updateButtons();
             } else {
                 alert("無効なJSON形式です");
             }
@@ -54,14 +57,21 @@ function handleFile(event) {
 function switchLocations(target) {
     locations = target;
     startAnimation();
-
-    const isSliced = target === slicedLocations;
-    setButtonsEnabled(!isSliced, isSliced);
+    updateButtons();
 }
 
-function setButtonsEnabled(sliceEnabled, rawEnabled) {
-    sliceButton.disabled = !sliceEnabled;
-    rawButton.disabled = !rawEnabled;
+// 表示中のボタンと、切り替え先の点が足りないボタンを無効化する
+// (グリッドに乗る点が1点以下しか無いほど短い軌跡は、切り替えさせない)
+function updateButtons() {
+    const buttons = [
+        { button: slice10Button, locations: sliced10Locations },
+        { button: slice30Button, locations: sliced30Locations },
+        { button: rawButton, locations: rawLocations },
+    ];
+
+    for (const target of buttons) {
+        target.button.disabled = target.locations === locations || target.locations.length < MIN_LOCATIONS;
+    };
 }
 
 function startAnimation() {
