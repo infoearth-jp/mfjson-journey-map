@@ -13,6 +13,8 @@
 <body>
     <h1>移動履歴アニメーション</h1>
     <input type="file" id="fileInput" accept=".json">
+    <button id="sliceButton" disabled>10秒間隔に切り替え</button>
+    <button id="rawButton" disabled>元データに切り替え</button>
     <div id="map">
         <div id="time-label">時刻: --:--:--</div>
     </div>
@@ -26,9 +28,14 @@
         }).addTo(map);
 
         let polyline, marker, locations = [], index = 0, intervalId = null;
+        let rawLocations = [], slicedLocations = [];
         const timeLabel = document.getElementById("time-label");
+        const sliceButton = document.getElementById("sliceButton");
+        const rawButton = document.getElementById("rawButton");
 
         document.getElementById("fileInput").addEventListener("change", handleFile);
+        sliceButton.addEventListener("click", () => switchLocations(slicedLocations));
+        rawButton.addEventListener("click", () => switchLocations(rawLocations));
     </script>
 </body>
 </html>

@@ -23,11 +23,14 @@ function handleFile(event) {
 
             if (data.geometry?.coordinates?.length > 0 && data.properties?.datetimes?.length > 0) {
                 // 緯度経度と時刻を取得(日本を想定しているので、大きい方が経度lon)
-                locations = data.geometry.coordinates.map((coord, i) => ({
+                rawLocations = data.geometry.coordinates.map((coord, i) => ({
                     lat: coord[0] > coord[1] ? coord[1] : coord[0], // 緯度
                     lon: coord[0] > coord[1] ? coord[0] : coord[1], // 経度
                     time: new Date(data.properties.datetimes[i])
                 }));
+                slicedLocations = complementMfjsonHandler(data);
+
+                locations = rawLocations;
 
                 // 地図の中心を座標の中間地点に設定
                 const midIndex = Math.floor(locations.length / 2);
@@ -35,6 +38,8 @@ function handleFile(event) {
                 map.setView([center.lat, center.lon], 15);
 
                 startAnimation();
+                // 10秒グリッドに乗る点が無いほど短い軌跡は、切り替えさせない
+                setButtonsEnabled(slicedLocations.length > 0, false);
             } else {
                 alert("無効なJSON形式です");
             }
@@ -43,6 +48,20 @@ function handleFile(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// 表示するデータを切り替える(カメラは動かさない)
+function switchLocations(target) {
+    locations = target;
+    startAnimation();
+
+    const isSliced = target === slicedLocations;
+    setButtonsEnabled(!isSliced, isSliced);
+}
+
+function setButtonsEnabled(sliceEnabled, rawEnabled) {
+    sliceButton.disabled = !sliceEnabled;
+    rawButton.disabled = !rawEnabled;
 }
 
 function startAnimation() {
@@ -81,17 +100,74 @@ function startAnimation() {
 };
 
 // ユーティリティ ==================================================
+// prev, nextの区間をsliceMilSec間隔で線形補間する。
+// prevを含みnextは含まないので、区間ごとの結果をそのまま連結できる。
+// prev: {time, lat, lon}
+// next: {time, lat, lon}
+// sliceMilSec: スライス間隔(ミリ秒)
 function complementDataWithSlice(prev, next, sliceMilSec){
-    const sliceTimes = Math.floor((next.time - prev.time) / sliceMilSec);
-    const sliceLat = (next.lat - prev.lat) / sliceTimes;
-    const sliceLon = (next.lon - prev.lon) / sliceTimes;
+    const totalMilSec = next.time.getTime() - prev.time.getTime();
+    // 同時刻・逆順の区間はprevを捨てる(nextが次の区間のprevとして残る)
+    if (totalMilSec <= 0) return [];
+
+    // ceilなので、区間がsliceMilSec未満でも最低1点(prev)は残る
+    const sliceTimes = Math.ceil(totalMilSec / sliceMilSec);
 
     const tmp = [];
     for (let i = 0; i < sliceTimes; i++){
+        const elapsedMilSec = sliceMilSec * i;
+        // スライス数ではなく実際の経過時間の比で按分する
+        const ratio = elapsedMilSec / totalMilSec;
         tmp.push({
-            time: new Date(prev.time.getTime() + sliceMilSec * i),
-            lat: prev.lat + sliceLat * i,
-            lon: prev.lon + sliceLon * i,
+            time: new Date(prev.time.getTime() + elapsedMilSec),
+            lat: prev.lat + (next.lat - prev.lat) * ratio,
+            lon: prev.lon + (next.lon - prev.lon) * ratio,
         });
     };
+
+    return tmp;
+};
+
+// mfjsonの軌跡をthinMilSec間隔に再サンプリングした[{time, lat, lon}, ...]を返す。
+// 1秒間隔で全区間を補間してから、thinMilSecの目盛りに乗る点だけを残す。
+// mfjson: {
+//     "type":"Feature",
+//     ~ ,
+//     "geometry":{
+//         "type":"LineString",
+//         "coordinates":[[lon, lat, alt], ...]
+//     },
+//     "properties":{
+//         "datetimes":["YYYY-MM-DDThh:mm:ss+09:00", ...]
+//     },
+//   }
+// sliceMilSec: 補間間隔(ミリ秒)
+// thinMilSec: 間引き後の間隔(ミリ秒)
+function complementMfjsonHandler(mfjson, sliceMilSec = 1000, thinMilSec = 10000){
+    const datetimes = mfjson.properties.datetimes;
+    const coordinates = mfjson.geometry.coordinates;
+    const length = Math.min(datetimes.length, coordinates.length);
+    if (length === 0) return [];
+
+    const points = [];
+    for (let i = 0; i < length; i++){
+        const time = new Date(datetimes[i]);
+        points.push({
+            // (timeを1秒の位で四捨五入する)
+            time: new Date(Math.round(time.getTime() / 1000) * 1000),
+            lat: coordinates[i][1],
+            lon: coordinates[i][0],
+        });
+    };
+
+    // 1秒間隔で不足分を埋める
+    const filled = [];
+    for (let i = 0; i < length - 1; i++){
+        filled.push(...complementDataWithSlice(points[i], points[i + 1], sliceMilSec));
+    };
+    // 各区間はnextを含まないので、最終点だけ手で足す
+    filled.push(points[length - 1]);
+
+    // thinMilSecの目盛りから外れた点を消す
+    return filled.filter(point => point.time.getTime() % thinMilSec === 0);
 };
