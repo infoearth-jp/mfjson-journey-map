@@ -1,28 +1,35 @@
 body {
     text-align: center;
     font-family: "Comic Sans MS", cursive, sans-serif;
-    background: linear-gradient(135deg, #ffccff, #ccffff);
+    background: linear-gradient(180deg, #cceeff, #ccffcc);
     color: #333;
     margin: 0;
     padding: 0;
 }
 h1 {
     font-size: 2rem;
-    color: #ff66b2;
-    text-shadow: 2px 2px 4px #ffffff;
+    color: #0E3C96;
 }
 #map {
     width: 1000px;
     height: 600px;
     margin: 20px auto;
-    border: 5px solid #ff66b2;
+    border: 5px solid #0E3C96;
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     position: relative;
 }
+#fileSection {
+    margin-bottom: 15px;
+}
+#buttonSection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
 #fileInput {
     padding: 10px;
-    border: 2px solid #ff66b2;
+    border: 2px solid #0E3C96;
     border-radius: 8px;
     background: #ffffff;
     cursor: pointer;
@@ -42,7 +49,7 @@ h1 {
 }
 button {
     padding: 10px 20px;
-    background: #ff66b2;
+    background: #0E3C96;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -50,7 +57,7 @@ button {
     transition: 0.3s;
 }
 button:hover {
-    background: #ff3385;
+    background: #092A6B;
 }
 button:disabled {
     background: #d9d9d9;

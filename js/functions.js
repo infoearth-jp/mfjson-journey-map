@@ -71,7 +71,7 @@ function startAnimation() {
     // 軌跡を描画
     if (polyline) map.removeLayer(polyline);
     polyline = L.polyline(locations.map(loc => [loc.lat, loc.lon]), {
-        color: "#66ccff",
+        color: "#0E3C96",
         weight: 3,
         // dashArray: "10, 10"
     }).addTo(map);

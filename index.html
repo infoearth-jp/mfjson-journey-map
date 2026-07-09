@@ -12,9 +12,13 @@
 </head>
 <body>
     <h1>移動履歴アニメーション</h1>
-    <input type="file" id="fileInput" accept=".json">
-    <button id="sliceButton" disabled>10秒間隔に切り替え</button>
-    <button id="rawButton" disabled>元データに切り替え</button>
+    <div id="fileSection">
+        <input type="file" id="fileInput" accept=".json">
+    </div>
+    <div id="buttonSection">
+        <button id="sliceButton" disabled>10秒間隔に切り替え</button>
+        <button id="rawButton" disabled>元データに切り替え</button>
+    </div>
     <div id="map">
         <div id="time-label">時刻: --:--:--</div>
     </div>
