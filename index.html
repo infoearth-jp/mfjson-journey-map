@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>移動履歴アニメーション</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
@@ -18,7 +19,9 @@
 
     <script>
         let map = L.map("map").setView([34.6833, 137.5720], 15); // 初期位置
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            referrerPolicy: "strict-origin-when-cross-origin",
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         }).addTo(map);
 
